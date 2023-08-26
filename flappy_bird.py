@@ -32,11 +32,13 @@ pipe_space_min_y = 130
 ground_scroll = 0
 pipe_scroll = SCREEN_WIDTH - pipe.get_width() + 100
 
-pipe_scroll_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 1)
+pipe_scroll_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
 for i, pos in enumerate(pipe_scroll_array):
     pipe_scroll_array[i] += SCREEN_WIDTH + pipe.get_width() + (i * pipe_space_max_x)
 
 print(pipe_scroll_array)
+max_distance_pipe = -1
+
 
 # pipe_scroll = 0
 speed = 4
@@ -55,12 +57,8 @@ while run:
         generate_pipe(pipe_scroll_array[i], pipe_space_min_y)
         pipe_scroll_array[i] -= speed
         if pipe_scroll_array[i] + pipe.get_width() <= -10:
-           pipe_scroll_array[i] = SCREEN_WIDTH + pipe.get_width()
-
-    # pipe_scroll_array[0] -= speed
-    # if pipe_scroll_array[0] + pipe.get_width() <= 0:
-    #     pipe_scroll_array[0] = SCREEN_WIDTH - pipe.get_width() + 100
-
+           pipe_scroll_array[i] = pipe_scroll_array[max_distance_pipe] + pipe_space_max_x
+           max_distance_pipe = i
 
 
     screen.blit(ground_img, (ground_scroll, SCREEN_HEIGHT - ground_img.get_height()))
