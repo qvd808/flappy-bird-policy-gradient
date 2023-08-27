@@ -32,9 +32,14 @@ class Bird:
         self.ground_img = ground_img
     
     def get_bird(self):
-        bird = self.animations[self.frame]
-        # self.frame = (self.frame + 1) % 3
-        return bird
+        # bird = self.animations[self.frame]
+        if self.acceleration == 0:
+            return self.animations[1]
+        elif self.acceleration > 0:
+            return self.animations[0]
+        else:
+            return self.animations[2]
+        # return bird
 
     def update_pos(self):
         if self.acceleration + 1 <= 4:
@@ -50,15 +55,15 @@ class Bird:
         self.screen.blit(self.get_bird(), (300, self.pos))
 
     def fly(self):
-        self.acceleration = -8
+        self.acceleration = -10
 
 bird = Bird(screen, ground_img)
 
-def generate_pipe(y_pos, pipe_space_y):
+def generate_pipe(y_pos, pipe_space_y, delta):
 
     ## Have an array of pipe on the screen (depend on the width of the screen). Only check collison for the first pipe since it is more efficient
-    screen.blit(pipe, (y_pos, SCREEN_HEIGHT - pipe.get_height()))
-    screen.blit(reverse_pipe, (y_pos, SCREEN_HEIGHT - 2 * pipe.get_height() - pipe_space_y))
+    screen.blit(pipe, (y_pos, SCREEN_HEIGHT - pipe.get_height() + delta))
+    screen.blit(reverse_pipe, (y_pos, SCREEN_HEIGHT - 2 * pipe.get_height() - pipe_space_y + delta))
 
 pipe_space_max_x = 288
 pipe_space_min_x = 266
@@ -70,8 +75,10 @@ ground_scroll = 0
 pipe_scroll = SCREEN_WIDTH - pipe.get_width() + 100
 
 pipe_scroll_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
+pipe_delta_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
 for i, pos in enumerate(pipe_scroll_array):
     pipe_scroll_array[i] += SCREEN_WIDTH + pipe.get_width() + (i * pipe_space_max_x)
+    pipe_delta_array[i] = random.randint(-ground_img.get_height(), 320)
 
 ## Track the current pipe that is far away the most to change the distance for the first pipe to leave the screen
 max_distance_pipe = -1 
@@ -95,7 +102,7 @@ while run:
     screen.blit(bg, (0, 0))
 
     for i, pos in enumerate(pipe_scroll_array):
-        generate_pipe(pipe_scroll_array[i], pipe_space_min_y)
+        generate_pipe(pipe_scroll_array[i], pipe_space_min_y, pipe_delta_array[i])
         pipe_scroll_array[i] -= speed
         if pipe_scroll_array[i] + pipe.get_width() <= -10:
            pipe_scroll_array[i] = pipe_scroll_array[max_distance_pipe] + pipe_space_max_x
