@@ -37,6 +37,11 @@ class Bird:
         return bird
 
     def update_pos(self):
+        if self.acceleration + 1 <= 4:
+            self.acceleration += 1
+        else:
+            self.acceleration = 4
+
         if self.pos + self.acceleration <= SCREEN_HEIGHT - self.ground_img.get_height() - self.get_bird().get_height():
             self.pos = self.pos + self.acceleration
         else:
@@ -45,7 +50,7 @@ class Bird:
         self.screen.blit(self.get_bird(), (300, self.pos))
 
     def fly(self):
-        pass
+        self.acceleration = -8
 
 bird = Bird(screen, ground_img)
 
@@ -80,6 +85,10 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                bird.fly()
 
     clock.tick(fps)
 
