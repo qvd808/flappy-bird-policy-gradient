@@ -157,8 +157,6 @@ while run:
     if ground_scroll + ground_img.get_width() == SCREEN_WIDTH:
         ground_scroll = 0
 
-
-
         
     pygame.display.update()
 
