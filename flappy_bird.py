@@ -62,8 +62,8 @@ class Bird:
 
 bird = Bird(screen, ground_img)
 
-def offset(mask1, mask2):
-    return int(mask2.x - mask1.x), int(mask2.y - mask1.y)
+# def offset(mask1, mask2):
+#     return int(mask2.x - mask1.x), int(mask2.y - mask1.y)
 
 def generate_pipe(y_pos, pipe_space_y, delta, mask_bird):
 
@@ -77,89 +77,94 @@ def generate_pipe(y_pos, pipe_space_y, delta, mask_bird):
     return (pipe_sprite.colliderect(mask_bird)) or (reverse_pipe_sprite.colliderect(mask_bird))
     
 
-pipe_space_max_x = 288
-pipe_space_min_x = 266
-pipe_space_max_y = 220
-pipe_space_min_y = 150
+def main():
+
+    pipe_space_max_x = 288
+    pipe_space_min_x = 266
+    pipe_space_max_y = 220
+    pipe_space_min_y = 150
 
 
-ground_scroll = 0
-pipe_scroll = SCREEN_WIDTH - pipe.get_width() + 100
+    ground_scroll = 0
+    pipe_scroll = SCREEN_WIDTH - pipe.get_width() + 100
 
-max_pressing_space_safe = 200
+    max_pressing_space_safe = 200
 
-pipe_scroll_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
-pipe_delta_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
-for i, pos in enumerate(pipe_scroll_array):
-    pipe_scroll_array[i] += SCREEN_WIDTH + pipe.get_width() + (i * pipe_space_max_x)
-    prev_index = (i - 1) % len(pipe_delta_array)
-    max_h = pipe_delta_array[prev_index] + random.randint(-1 * max_pressing_space_safe, max_pressing_space_safe)
-    if max_h > 320:
-        max_h = 320
-    if max_h < -ground_img.get_height():
-        max_h = -ground_img.get_height()
-    pipe_delta_array[i] = max_h
-
-## Track the current pipe that is far away the most to change the distance for the first pipe to leave the screen
-max_distance_pipe = -1 
-
-
-# pipe_scroll = 0
-speed = 4
-run = True
-lose_game = False
-while run:
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                bird.fly()
-
-    clock.tick(fps)
-
-    screen.blit(bg, (0, 0))
-
-    mask_bird = bird.update_pos()
-
-
+    pipe_scroll_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
+    pipe_delta_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
     for i, pos in enumerate(pipe_scroll_array):
-        lose_game = generate_pipe(pipe_scroll_array[i], pipe_space_min_y, pipe_delta_array[i], mask_bird)
+        pipe_scroll_array[i] += SCREEN_WIDTH + pipe.get_width() + (i * pipe_space_max_x)
+        prev_index = (i - 1) % len(pipe_delta_array)
+        max_h = pipe_delta_array[prev_index] + random.randint(-1 * max_pressing_space_safe, max_pressing_space_safe)
+        if max_h > 320:
+            max_h = 320
+        if max_h < -ground_img.get_height():
+            max_h = -ground_img.get_height()
+        pipe_delta_array[i] = max_h
 
+    ## Track the current pipe that is far away the most to change the distance for the first pipe to leave the screen
+    max_distance_pipe = -1 
+
+
+    # pipe_scroll = 0
+    speed = 4
+    run = True
+    lose_game = False
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    bird.fly()
+
+        clock.tick(fps)
+
+        screen.blit(bg, (0, 0))
+
+        mask_bird = bird.update_pos()
+
+
+        for i, pos in enumerate(pipe_scroll_array):
+            lose_game = generate_pipe(pipe_scroll_array[i], pipe_space_min_y, pipe_delta_array[i], mask_bird)
+
+            if lose_game:
+                break
+
+            pipe_scroll_array[i] -= speed
+            if pipe_scroll_array[i] + pipe.get_width() <= -10:
+                pipe_scroll_array[i] = pipe_scroll_array[max_distance_pipe] + pipe_space_max_x
+                prev_index = (i - 1) % len(pipe_delta_array)
+                max_h = pipe_delta_array[prev_index] + random.randint(-1 * max_pressing_space_safe, max_pressing_space_safe)
+                if max_h > 320:
+                    max_h = 320
+                if max_h < -ground_img.get_height():
+                    max_h = -ground_img.get_height()
+                pipe_delta_array[i] = max_h
+                max_distance_pipe = i
+            
         if lose_game:
-            break
+            pause = True
+            while pause:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pause = False
+                        run = False
 
-        pipe_scroll_array[i] -= speed
-        if pipe_scroll_array[i] + pipe.get_width() <= -10:
-           pipe_scroll_array[i] = pipe_scroll_array[max_distance_pipe] + pipe_space_max_x
-           prev_index = (i - 1) % len(pipe_delta_array)
-           max_h = pipe_delta_array[prev_index] + random.randint(-1 * max_pressing_space_safe, max_pressing_space_safe)
-           if max_h > 320:
-               max_h = 320
-           if max_h < -ground_img.get_height():
-               max_h = -ground_img.get_height()
-           pipe_delta_array[i] = max_h
-           max_distance_pipe = i
-    
-    if lose_game:
-        pause = True
-        while pause:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pause = False
-                    run = False
+        screen.blit(ground_img, (ground_scroll, SCREEN_HEIGHT - ground_img.get_height()))
+        ground_scroll -= speed
 
-    screen.blit(ground_img, (ground_scroll, SCREEN_HEIGHT - ground_img.get_height()))
-    ground_scroll -= speed
-
-    if ground_scroll + ground_img.get_width() == SCREEN_WIDTH:
-        ground_scroll = 0
+        if ground_scroll + ground_img.get_width() == SCREEN_WIDTH:
+            ground_scroll = 0
 
 
 
-        
-    pygame.display.update()
+            
+        pygame.display.update()
 
-pygame.quit()
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
