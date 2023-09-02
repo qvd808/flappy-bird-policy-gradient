@@ -74,56 +74,55 @@ class FlappyBirdEnv(gym.Env):
             #     pygame.quit()
 
             return (pipe_sprite.colliderect(mask_bird)) or (reverse_pipe_sprite.colliderect(mask_bird))
+
         speed = 4
-        while run:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-            
-            if action:
-                self.bird.fly()
-            
-            self.clock.tick(self.fps)
+        # while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        
+        if action:
+            self.bird.fly()
+        
+        self.clock.tick(self.fps)
 
-            self.screen.blit(self.bg, (0, 0))
+        self.screen.blit(self.bg, (0, 0))
 
-            mask_bird = self.bird.update_pos()
+        mask_bird = self.bird.update_pos()
 
-            for i, pos in enumerate(self.pipe_scroll_array):
-                lose_game = generate_pipe(self.pipe_scroll_array[i], self.pipe_space_min_y, self.pipe_delta_array[i], mask_bird)
+        for i, pos in enumerate(self.pipe_scroll_array):
+            lose_game = generate_pipe(self.pipe_scroll_array[i], self.pipe_space_min_y, self.pipe_delta_array[i], mask_bird)
 
-                if lose_game:
-                    break
-
-                self.pipe_scroll_array[i] -= speed
-                if self.pipe_scroll_array[i] + self.pipe.get_width() <= -10:
-                    self.pipe_scroll_array[i] = self.pipe_scroll_array[self.max_distance_pipe] + self.pipe_space_max_x
-                    prev_index = (i - 1) % len(self.pipe_delta_array)
-                    max_h = self.pipe_delta_array[prev_index] + random.randint(-1 * self.max_pressing_space_safe, self.max_pressing_space_safe)
-                    if max_h > 320:
-                        max_h = 320
-                    if max_h < -self.ground_img.get_height():
-                        max_h = -self.ground_img.get_height()
-                    self.pipe_delta_array[i] = max_h
-                    self.max_distance_pipe = i
-                
             if lose_game:
-                pause = True
-                while pause:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            pause = False
-                            run = False
+                break
 
-            self.screen.blit(self.ground_img, (self.ground_scroll, self.SCREEN_HEIGHT - self.ground_img.get_height()))
-            self.ground_scroll -= speed
-
-            if self.ground_scroll + self.ground_img.get_width() == self.SCREEN_WIDTH:
-                self.ground_scroll = 0
-
-
+            self.pipe_scroll_array[i] -= speed
+            if self.pipe_scroll_array[i] + self.pipe.get_width() <= -10:
+                self.pipe_scroll_array[i] = self.pipe_scroll_array[self.max_distance_pipe] + self.pipe_space_max_x
+                prev_index = (i - 1) % len(self.pipe_delta_array)
+                max_h = self.pipe_delta_array[prev_index] + random.randint(-1 * self.max_pressing_space_safe, self.max_pressing_space_safe)
+                if max_h > 320:
+                    max_h = 320
+                if max_h < -self.ground_img.get_height():
+                    max_h = -self.ground_img.get_height()
+                self.pipe_delta_array[i] = max_h
+                self.max_distance_pipe = i
             
-            pygame.display.update()
+        if lose_game:
+            pause = True
+            while pause:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pause = False
+                        run = False
+
+        self.screen.blit(self.ground_img, (self.ground_scroll, self.SCREEN_HEIGHT - self.ground_img.get_height()))
+        self.ground_scroll -= speed
+
+        if self.ground_scroll + self.ground_img.get_width() == self.SCREEN_WIDTH:
+            self.ground_scroll = 0
+
+        pygame.display.update()
 
 
     
@@ -133,4 +132,7 @@ class FlappyBirdEnv(gym.Env):
 
 if __name__ == "__main__":
     env = FlappyBirdEnv(render_mode = "human")
-    env.step(0)
+    for i in range(20):
+        for j in range(300):
+            action = np.random.randint(0, 2)
+            env.step(action)

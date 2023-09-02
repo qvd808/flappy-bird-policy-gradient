@@ -48,22 +48,21 @@ class Bird:
         else:
             self.velocity = self.max_vel
 
-        if self.pos + self.velocity <= SCREEN_HEIGHT - self.ground_img.get_height() - self.get_bird().get_height():
-            self.pos = self.pos + self.velocity
-        else:
+        if 0 < self.pos + self.velocity <= SCREEN_HEIGHT - self.ground_img.get_height() - self.get_bird().get_height():
+            self.pos += self.velocity
+        elif self.pos + self.velocity >= SCREEN_HEIGHT - self.ground_img.get_height() - self.get_bird().get_height():
             self.pos = SCREEN_HEIGHT - self.ground_img.get_height() - self.get_bird().get_height()
-        
+        elif self.pos + self.velocity <= -500:
+            self.pos = -500
+
         result = self.screen.blit(self.get_bird(), (300, self.pos))
 
         return result
 
     def fly(self):
-        self.velocity = -10
+        self.velocity = -9
 
 bird = Bird(screen, ground_img)
-
-# def offset(mask1, mask2):
-#     return int(mask2.x - mask1.x), int(mask2.y - mask1.y)
 
 def generate_pipe(y_pos, pipe_space_y, delta, mask_bird):
 
@@ -88,10 +87,12 @@ def main():
     ground_scroll = 0
     pipe_scroll = SCREEN_WIDTH - pipe.get_width() + 100
 
+    free_pipe_dis = 500
+
     max_pressing_space_safe = 200
 
-    pipe_scroll_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
-    pipe_delta_array = [0] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
+    pipe_scroll_array = [free_pipe_dis] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
+    pipe_delta_array = [free_pipe_dis] * ( SCREEN_WIDTH // pipe_space_max_x + 2)
     for i, pos in enumerate(pipe_scroll_array):
         pipe_scroll_array[i] += SCREEN_WIDTH + pipe.get_width() + (i * pipe_space_max_x)
         prev_index = (i - 1) % len(pipe_delta_array)
