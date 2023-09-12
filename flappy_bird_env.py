@@ -24,11 +24,13 @@ bird3 = pygame.image.load("img/bird3.png")
 def generate_pipe(y_pos, pipe_space_y, delta):
 
     ## Have an array of pipe on the screen (depend on the width of the screen). Only check collison for the first pipe since it is more efficient
-    pipe_sprite = screen.blit(pipe, (y_pos, SCREEN_HEIGHT - pipe.get_height()))
-    reverse_pipe_sprite = screen.blit(reverse_pipe, (y_pos,  SCREEN_HEIGHT - pipe.get_height() - 50))
+    # pipe_sprite = screen.blit(pipe, (y_pos, SCREEN_HEIGHT - pipe.get_height()))
+    # reverse_pipe_sprite = screen.blit(reverse_pipe, (y_pos,  SCREEN_HEIGHT - pipe.get_height() - 50))
 
 
-    reverse_pipe_sprite = screen.blit(reverse_pipe, (y_pos+100,  SCREEN_HEIGHT - 2*pipe.get_height() - 50))
+    # reverse_pipe_sprite = screen.blit(reverse_pipe, (y_pos+100,  SCREEN_HEIGHT - 2*pipe.get_height() - 50))
+
+    pipe_sprite = screen.blit(pipe, (0, 0))
 
 
     # if (pipe_sprite.colliderect(mask_bird)) or (reverse_pipe_sprite.colliderect(mask_bird)):

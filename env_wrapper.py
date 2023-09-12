@@ -93,15 +93,14 @@ class FlappyBirdEnv(gym.Env):
         self.screen.blit(self.bg, (0, 0))
 
         mask_bird = self.bird.update_pos()
-        print(mask_bird)
 
         ## bottom = SCREEN_HEIGHT - pipe.get_height(), SCREEN_HEIGHT - pipe.get_height() + delta is top
 
         if self.pipe_scroll_array[self.closest_pipe] - speed < 300:
             self.closest_pipe = (self.closest_pipe + 1) % len(self.pipe_scroll_array)
         
-        bird_to_top = self.SCREEN_HEIGHT - self.pipe.get_height() - self.pipe_delta_array[self.closest_pipe]
-        bird_to_bottom = self.SCREEN_HEIGHT - self.pipe.get_height()
+        bird_to_bottom = self.SCREEN_HEIGHT - self.pipe.get_height() + self.pipe_delta_array[self.closest_pipe]
+        bird_to_top = self.SCREEN_HEIGHT - self.pipe.get_height() + self.pipe_delta_array[self.closest_pipe] - self.pipe_space_min_y
         
 
 
