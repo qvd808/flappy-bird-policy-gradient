@@ -64,9 +64,13 @@ class FlappyBirdEnv(gym.Env):
 
     def step(self, action):
         
+        ## Return obs, reward, end_game?, info
+
         y_bird, bird_velocity, bird_to_top, bird_to_bottom = 0, 0, 0, 0
         y_bird = self.bird.pos
         bird_velocity = self.bird.velocity
+        reward  = 1
+        info = {}
 
         def generate_pipe(y_pos, pipe_space_y, delta, mask_bird):
 
@@ -121,14 +125,15 @@ class FlappyBirdEnv(gym.Env):
                     max_h = -self.ground_img.get_height()
                 self.pipe_delta_array[i] = max_h
                 self.max_distance_pipe = i
-            
-        if lose_game:
-            pause = True
-            while pause:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pause = False
-                        run = False
+        
+        ## Uncomment this make the game goes paused after bird die
+        # if lose_game:
+        #     pause = True
+        #     while pause:
+        #         for event in pygame.event.get():
+        #             if event.type == pygame.QUIT:
+        #                 pause = False
+        #                 run = False
 
         self.screen.blit(self.ground_img, (self.ground_scroll, self.SCREEN_HEIGHT - self.ground_img.get_height()))
         self.ground_scroll -= speed
@@ -138,7 +143,7 @@ class FlappyBirdEnv(gym.Env):
 
         pygame.display.update()
 
-        return y_bird, bird_velocity, bird_to_top, bird_to_bottom
+        return (y_bird, bird_velocity, bird_to_top, bird_to_bottom), reward, lose_game, info
 
 
     
