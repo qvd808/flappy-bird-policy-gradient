@@ -148,16 +148,51 @@ class FlappyBirdEnv(gym.Env):
 
     
     def reset(self):
-        pass
+
+        self.SCREEN_WIDTH = 800
+        self.SCREEN_HEIGHT = 900
+
+        self.pipe_space_max_x = 288
+        self.pipe_space_min_x = 266
+        self.pipe_space_max_y = 220
+        self.pipe_space_min_y = 150
+        self.ground_scroll = 0
+
+        self.max_pressing_space_safe = 200
+
+        self.clock = pygame.time.Clock()
+        self.fps = 60
+
+        self.pipe_scroll_array = [0] * ( self.SCREEN_WIDTH // self.pipe_space_max_x + 2)
+        self.pipe_delta_array = [0] * ( self.SCREEN_WIDTH // self.pipe_space_max_x + 2)
+        self.max_distance_pipe = -1 
+        self.closest_pipe = 0
+
+
+        for i, pos in enumerate(self.pipe_scroll_array):
+            self.pipe_scroll_array[i] += self.SCREEN_WIDTH + self.pipe.get_width() + (i * self.pipe_space_max_x)
+            prev_index = (i - 1) % len(self.pipe_delta_array)
+            max_h = self.pipe_delta_array[prev_index] + random.randint(-1 * self.max_pressing_space_safe, self.max_pressing_space_safe)
+            if max_h > 320:
+                max_h = 320
+            if max_h < -self.ground_img.get_height():
+                max_h = -self.ground_img.get_height()
+            self.pipe_delta_array[i] = max_h
+        
+        self.bird = Bird(self.screen, self.ground_img)
 
 
 if __name__ == "__main__":
     env = FlappyBirdEnv(render_mode = "human")
-    for j in range(300):
-        if j % 18 == 0:
-            action = 1
-        else:
-            action = 0
+    while True:
+        for j in range(300):
+            if j % 18 == 0:
+                action = 1
+            else:
+                action = 0
 
-        obs = env.step(action)
-        print(obs)
+            obs, reward, terminate, info = env.step(action)
+
+            if terminate:
+                env.reset()
+                break
