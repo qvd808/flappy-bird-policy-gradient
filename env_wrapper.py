@@ -93,6 +93,7 @@ class FlappyBirdEnv(gym.Env):
         self.screen.blit(self.bg, (0, 0))
 
         mask_bird = self.bird.update_pos()
+        print(mask_bird)
 
         ## bottom = SCREEN_HEIGHT - pipe.get_height(), SCREEN_HEIGHT - pipe.get_height() + delta is top
 
