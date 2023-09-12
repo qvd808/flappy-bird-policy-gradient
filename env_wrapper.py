@@ -132,7 +132,10 @@ class FlappyBirdEnv(gym.Env):
 
 if __name__ == "__main__":
     env = FlappyBirdEnv(render_mode = "human")
-    for i in range(20):
-        for j in range(300):
-            action = np.random.randint(0, 2)
-            env.step(action)
+    for j in range(300):
+        if j % 15 == 0:
+            action = 1
+        else:
+            action = 0
+
+        env.step(action)
