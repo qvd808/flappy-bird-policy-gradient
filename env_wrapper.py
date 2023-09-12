@@ -62,6 +62,9 @@ class FlappyBirdEnv(gym.Env):
    
 
     def step(self, action):
+
+        bird_pos, bird_velocity, bird_to_top, bird_to_bottom = 0, 0, 0, 0
+
         run = True
 
         def generate_pipe(y_pos, pipe_space_y, delta, mask_bird):
@@ -89,6 +92,7 @@ class FlappyBirdEnv(gym.Env):
         self.screen.blit(self.bg, (0, 0))
 
         mask_bird = self.bird.update_pos()
+        print(mask_bird)
 
         for i, pos in enumerate(self.pipe_scroll_array):
             lose_game = generate_pipe(self.pipe_scroll_array[i], self.pipe_space_min_y, self.pipe_delta_array[i], mask_bird)
