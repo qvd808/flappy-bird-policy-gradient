@@ -44,6 +44,7 @@ class FlappyBirdEnv(gym.Env):
         self.pipe_scroll_array = [0] * ( self.SCREEN_WIDTH // self.pipe_space_max_x + 2)
         self.pipe_delta_array = [0] * ( self.SCREEN_WIDTH // self.pipe_space_max_x + 2)
         self.max_distance_pipe = -1 
+        self.closest_pipe = 0
 
 
         for i, pos in enumerate(self.pipe_scroll_array):
@@ -62,7 +63,10 @@ class FlappyBirdEnv(gym.Env):
    
 
     def step(self, action):
-        run = True
+        
+        y_bird, bird_velocity, bird_to_top, bird_to_bottom = 0, 0, 0, 0
+        y_bird = self.bird.pos
+        bird_velocity = self.bird.velocity
 
         def generate_pipe(y_pos, pipe_space_y, delta, mask_bird):
 
@@ -89,6 +93,16 @@ class FlappyBirdEnv(gym.Env):
         self.screen.blit(self.bg, (0, 0))
 
         mask_bird = self.bird.update_pos()
+
+        ## bottom = SCREEN_HEIGHT - pipe.get_height(), SCREEN_HEIGHT - pipe.get_height() + delta is top
+
+        if self.pipe_scroll_array[self.closest_pipe] - speed < 300:
+            self.closest_pipe = (self.closest_pipe + 1) % len(self.pipe_scroll_array)
+        
+        bird_to_top = self.SCREEN_HEIGHT - self.pipe.get_height() - self.pipe_delta_array[self.closest_pipe]
+        bird_to_bottom = self.SCREEN_HEIGHT - self.pipe.get_height()
+        
+
 
         for i, pos in enumerate(self.pipe_scroll_array):
             lose_game = generate_pipe(self.pipe_scroll_array[i], self.pipe_space_min_y, self.pipe_delta_array[i], mask_bird)
@@ -124,6 +138,8 @@ class FlappyBirdEnv(gym.Env):
 
         pygame.display.update()
 
+        return y_bird, bird_velocity, bird_to_top, bird_to_bottom
+
 
     
     def reset(self):
@@ -133,9 +149,10 @@ class FlappyBirdEnv(gym.Env):
 if __name__ == "__main__":
     env = FlappyBirdEnv(render_mode = "human")
     for j in range(300):
-        if j % 15 == 0:
+        if j % 18 == 0:
             action = 1
         else:
             action = 0
 
-        env.step(action)
+        obs = env.step(action)
+        print(obs)
