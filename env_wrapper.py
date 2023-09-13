@@ -143,7 +143,7 @@ class FlappyBirdEnv(gym.Env):
 
         pygame.display.update()
 
-        return (y_bird, bird_velocity, bird_to_top, bird_to_bottom), reward, lose_game, info
+        return np.array([y_bird, bird_velocity, bird_to_top, bird_to_bottom], dtype=np.float32), reward, lose_game, info
 
 
     
@@ -168,6 +168,9 @@ class FlappyBirdEnv(gym.Env):
         self.max_distance_pipe = -1 
         self.closest_pipe = 0
 
+        bird_to_bottom = self.SCREEN_HEIGHT - self.pipe.get_height() + self.pipe_delta_array[self.closest_pipe]
+        bird_to_top = self.SCREEN_HEIGHT - self.pipe.get_height() + self.pipe_delta_array[self.closest_pipe] - self.pipe_space_min_y
+
 
         for i, pos in enumerate(self.pipe_scroll_array):
             self.pipe_scroll_array[i] += self.SCREEN_WIDTH + self.pipe.get_width() + (i * self.pipe_space_max_x)
@@ -180,6 +183,15 @@ class FlappyBirdEnv(gym.Env):
             self.pipe_delta_array[i] = max_h
         
         self.bird = Bird(self.screen, self.ground_img)
+
+        y_bird, bird_velocity, bird_to_top, bird_to_bottom = 0, 0, 0, 0
+        y_bird = self.bird.pos
+        bird_velocity = self.bird.velocity
+        reward  = 1
+        info = {}
+
+
+        return np.array([y_bird, bird_velocity, bird_to_top, bird_to_bottom], dtype=np.float32), info
 
 
 if __name__ == "__main__":

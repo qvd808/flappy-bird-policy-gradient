@@ -1,50 +1,66 @@
-import pygame
-import random, sys
+import torch
+import gym
+from model import Model
+from collections import deque
+import numpy as np
+from env_wrapper import FlappyBirdEnv
 
-pygame.init()
+env = FlappyBirdEnv(render_mode = "human")
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 900
+policy = Model(4, 2)
 
-clock = pygame.time.Clock()
-fps = 60
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Flappy Bird")
-
-bg = pygame.image.load("img/bg.png")
-ground_img = pygame.image.load("img/ground.png")
-pipe = pygame.image.load("img/pipe.png")
-reverse_pipe = pygame.transform.flip(pipe, False, True)
-
-bird1 = pygame.image.load("img/bird1.png")
-bird2 = pygame.image.load("img/bird2.png")
-bird3 = pygame.image.load("img/bird3.png")
-
-def generate_pipe(y_pos, pipe_space_y, delta):
-
-    ## Have an array of pipe on the screen (depend on the width of the screen). Only check collison for the first pipe since it is more efficient
-    # pipe_sprite = screen.blit(pipe, (y_pos, SCREEN_HEIGHT - pipe.get_height()))
-    # reverse_pipe_sprite = screen.blit(reverse_pipe, (y_pos,  SCREEN_HEIGHT - pipe.get_height() - 50))
-
-
-    # reverse_pipe_sprite = screen.blit(reverse_pipe, (y_pos+100,  SCREEN_HEIGHT - 2*pipe.get_height() - 50))
-
-    pipe_sprite = screen.blit(pipe, (0, 0))
-
-
-    # if (pipe_sprite.colliderect(mask_bird)) or (reverse_pipe_sprite.colliderect(mask_bird)):
-    #     pygame.quit()
-
-    # return (pipe_sprite.colliderect(mask_bird)) or (reverse_pipe_sprite.colliderect(mask_bird))
-run = True
-while run:
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+def reinforce(policy, n_training_episodes, max_t, gamma, print_every):
+    scores_deque = deque(maxlen=100)
+    scores = []
+    for i_episode in range(1, n_training_episodes+1):
+        saved_log_probs = []
+        rewards = []
+        state, info = env.reset()
+        # Line 4 of pseudocode
+        for t in range(max_t):
+            # print(state)
+            # import ipdb; ipdb.set_trace()
+            
+            action, log_prob = policy.act(torch.tensor(state))
+            saved_log_probs.append(log_prob)
+            state, reward, done, _ = env.step(action)
+            rewards.append(reward)
+            if done:
+                break 
+        scores_deque.append(sum(rewards))
+        scores.append(sum(rewards))
         
-    
-    generate_pipe(300, 100, 0)
+        returns = deque(maxlen=max_t) 
+        n_steps = len(rewards) 
+        
+        for t in range(n_steps)[::-1]:
+            disc_return_t = (returns[0] if len(returns)>0 else 0)
+            returns.appendleft( gamma*disc_return_t + rewards[t]   )    
+            
+        eps = np.finfo(np.float32).eps.item()
+        returns = torch.tensor(returns, dtype = torch.float32)
+        returns = (returns - returns.mean()) / (returns.std() + eps)
+        
+        policy_loss = []
+        for log_prob, disc_return in zip(saved_log_probs, returns):
+            policy_loss.append(-log_prob * disc_return)
+        
+        # print(policy_loss)
+        policy_loss = torch.cat(policy_loss).sum()
+        
+        policy.optimizer.zero_grad()
+        policy_loss.backward()
+        policy.optimizer.step()
+        
+        if i_episode % print_every == 0:
+            print('Episode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
+        
+    return scores
 
-    pygame.display.update()
+reinforce(
+    policy=policy,
+    n_training_episodes=1000,
+    max_t = 500,
+    gamma = 1,
+    print_every=100
+    )

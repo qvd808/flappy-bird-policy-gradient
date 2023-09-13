@@ -17,6 +17,7 @@ def reinforce(policy, n_training_episodes, max_t, gamma, print_every):
         # Line 4 of pseudocode
         for t in range(max_t):
             # print(state)
+            import ipdb; ipdb.set_trace()
             action, log_prob = policy.act(torch.tensor(state))
             saved_log_probs.append(log_prob)
             state, reward, done, terminated, _ = env.step(action)
