@@ -8,8 +8,8 @@ from env_wrapper import FlappyBirdEnv
 env = FlappyBirdEnv(render_mode = "human")
 
 policy = Model(4, 2)
-
 def reinforce(policy, n_training_episodes, max_t, gamma, print_every):
+    is_pick = True
     scores_deque = deque(maxlen=100)
     scores = []
     for i_episode in range(1, n_training_episodes+1):
@@ -20,10 +20,15 @@ def reinforce(policy, n_training_episodes, max_t, gamma, print_every):
         for t in range(max_t):
             # print(state)
             # import ipdb; ipdb.set_trace()
+            pick = np.random.uniform()
             
             action, log_prob = policy.act(torch.tensor(state))
             saved_log_probs.append(log_prob)
+            # if is_pick and pick <= 0.1:
+            #     state, reward, done, _ = env.step(env.action_space.sample())
+            # else:
             state, reward, done, _ = env.step(action)
+
             rewards.append(reward)
             if done:
                 break 
@@ -54,13 +59,15 @@ def reinforce(policy, n_training_episodes, max_t, gamma, print_every):
         
         if i_episode % print_every == 0:
             print('Episode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
-        
+        if i_episode % print_every == 200:
+            is_pick = False
+
     return scores
 
 reinforce(
     policy=policy,
     n_training_episodes=1000,
     max_t = 500,
-    gamma = 1,
+    gamma = 0.98,
     print_every=100
     )

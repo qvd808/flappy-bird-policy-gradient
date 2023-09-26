@@ -69,7 +69,7 @@ class FlappyBirdEnv(gym.Env):
         y_bird, bird_velocity, bird_to_top, bird_to_bottom = 0, 0, 0, 0
         y_bird = self.bird.pos
         bird_velocity = self.bird.velocity
-        reward  = 1
+        reward  = 0
         info = {}
 
         def generate_pipe(y_pos, pipe_space_y, delta, mask_bird):
@@ -101,17 +101,25 @@ class FlappyBirdEnv(gym.Env):
         ## bottom = SCREEN_HEIGHT - pipe.get_height(), SCREEN_HEIGHT - pipe.get_height() + delta is top
 
         if self.pipe_scroll_array[self.closest_pipe] - speed < 300:
+            reward += 100
             self.closest_pipe = (self.closest_pipe + 1) % len(self.pipe_scroll_array)
         
         bird_to_bottom = self.SCREEN_HEIGHT - self.pipe.get_height() + self.pipe_delta_array[self.closest_pipe]
         bird_to_top = self.SCREEN_HEIGHT - self.pipe.get_height() + self.pipe_delta_array[self.closest_pipe] - self.pipe_space_min_y
         
-
+        # print(self.bird.pos, bird_to_top)
+        
+        if self.bird.pos < bird_to_bottom and self.bird.pos > bird_to_top:
+            pygame.draw.line(self.screen, (217,33,33),(300, self.bird.pos), (self.pipe_scroll_array[self.closest_pipe], bird_to_top))
+            pygame.draw.line(self.screen, (217,33,33),(300, self.bird.pos), (self.pipe_scroll_array[self.closest_pipe], bird_to_bottom))
+            # print(self.bird.pos, bird_to_bottom, bird_to_top)
+            reward = 1
 
         for i, pos in enumerate(self.pipe_scroll_array):
             lose_game = generate_pipe(self.pipe_scroll_array[i], self.pipe_space_min_y, self.pipe_delta_array[i], mask_bird)
 
             if lose_game:
+                reward = -20
                 break
 
             self.pipe_scroll_array[i] -= speed

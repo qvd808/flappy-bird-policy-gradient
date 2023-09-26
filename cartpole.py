@@ -17,7 +17,7 @@ def reinforce(policy, n_training_episodes, max_t, gamma, print_every):
         # Line 4 of pseudocode
         for t in range(max_t):
             # print(state)
-            import ipdb; ipdb.set_trace()
+            # import ipdb; ipdb.set_trace()
             action, log_prob = policy.act(torch.tensor(state))
             saved_log_probs.append(log_prob)
             state, reward, done, terminated, _ = env.step(action)
@@ -51,6 +51,7 @@ def reinforce(policy, n_training_episodes, max_t, gamma, print_every):
         
         if i_episode % print_every == 0:
             print('Episode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
+
         
     return scores
 
