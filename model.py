@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
-import gym
+import gymnasium as gym
 
 class Model(nn.Module):
     def __init__(self, in_dim, out_dim):

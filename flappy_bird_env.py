@@ -1,5 +1,5 @@
 import torch
-import gym
+import gymnasium as gym
 from model import Model
 from collections import deque
 import numpy as np
