@@ -16,7 +16,9 @@ class FlappyBirdRender():
         self.game = game
         self.surface = pygame.Surface((game.screen_width, game.screen_height))
         
-    
+    def run_in_fps(self):
+        self.clock.tick(self.fps)
+
     def make_display(self):
         self.display = pygame.display.set_mode((self.game.screen_width, self.game.screen_height))
         
@@ -37,9 +39,33 @@ class FlappyBirdRender():
 
         self.surface.blit(FlappyBird.SpriteClass.BIRD, (self.game.bird_x, self.game.bird_y))
 
+        ###
+
+        # bird_x = self.game.bird_x
+        # bird_y = self.game.bird_y
+        # v_dist = float("inf")
+        # upper_pipe_coor = (0, 0)
+        # for pipe in self.game.upper_pipes:
+        #     if self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() - self.game.bird_x < 0:
+        #         continue
+        #     if v_dist > (self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() // 2 - self.game.bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2):
+        #         v_dist = self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() // 2 - self.game.bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2
+        #         upper_pipe_coor = (self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() // 2,
+        #                 self.game.upper_pipes[pipe][1] + FlappyBird.SpriteClass.LOWER_PIPE.get_height())
+        # lower_pipe_coor = upper_pipe_coor[0], upper_pipe_coor[1] + self.game.pipe_gap
+
+        # pygame.draw.circle(self.surface, (217, 33, 33), upper_pipe_coor, 5)
+        # pygame.draw.circle(self.surface, (217, 33, 33), lower_pipe_coor, 5)
+        # pygame.draw.line(self.surface,(217, 33, 33), (bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2, 0), (bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2, self.game.screen_height))
+        # # if self.renderer != None:
+        # pygame.draw.line(self.surface, (217,33,33), (bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2, bird_y + FlappyBird.SpriteClass.BIRD.get_height() // 2), upper_pipe_coor)
+        # pygame.draw.line(self.surface, (217,33,33), (bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2, bird_y + FlappyBird.SpriteClass.BIRD.get_height() // 2), lower_pipe_coor)
+
     def update_display(self):
         if self.display == None:
             raise ValueError("There is no display")
+
+        self.run_in_fps()
 
         self.display.blit(self.surface, [0, 0])
         pygame.display.update()
@@ -59,9 +85,6 @@ class FlappyBirdRender():
 
             self.update_surface()
             self.update_display()
-
-            self.game.next_state()
-
 
 if __name__ == "__main__":
     game = FlappyBird(

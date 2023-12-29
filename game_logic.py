@@ -65,7 +65,7 @@ class FlappyBird:
             3:  (self.screen_width - self.pipe_width + 750, -300 + self.pipe_height + self.pipe_gap),
             4:  (self.screen_width - self.pipe_width + 750, -300 + self.pipe_height + self.pipe_gap),
         }
-
+        self.closest_pipe = 0
         self.pipe_vel:int = -4
 
     class SpriteClass:
@@ -81,6 +81,7 @@ class FlappyBird:
             if old_x + self.pipe_width + self.pipe_vel < 0:
                 furthest_x, _ = self.upper_pipes[(pipe + 4) % 5]
                 self.upper_pipes[pipe] = (furthest_x + 250, -300)
+                self.closest_pipe = (self.closest_pipe + 1) % 5
             else:
                 self.upper_pipes[pipe] = (old_x + self.pipe_vel, old_y)
 
@@ -136,3 +137,38 @@ class FlappyBird:
             return True
 
         return False
+    
+    def reset(self):
+                
+        ## Bird properties
+        self.bird_x = self.screen_width // 5
+        self.bird_y = self.screen_height // 2
+        self.bird_vel = 4
+        self.bird_acc = 1
+        self.bird_max_vel = 6
+
+        ## ground
+        self.ground_x = 0
+        self.ground_y = self.screen_height - self.SpriteClass.GROUND.get_height()
+        self.ground_vel = -4
+
+        ## pipe properties
+        self.pipe_height: int = self.SpriteClass.LOWER_PIPE.get_height()
+        self.pipe_width: int = self.SpriteClass.LOWER_PIPE.get_width()
+        self.pipe_gap: int = 250 # space between upper and lower pipe
+        self.upper_pipes: Dict[0, Tuple(int, int)] = {
+            0:  (self.screen_width - self.pipe_width, -300),
+            1:  (self.screen_width - self.pipe_width + 250, -300),
+            2:  (self.screen_width - self.pipe_width + 500, -300),
+            3:  (self.screen_width - self.pipe_width + 750, -300),
+            4:  (self.screen_width - self.pipe_width + 750, -300),
+        }
+        self.lower_pipes: Dict[0, Tuple(int, int)] = {
+            0:  (self.screen_width - self.pipe_width, -300 + self.pipe_height + self.pipe_gap),
+            1:  (self.screen_width - self.pipe_width + 250, -300 + self.pipe_height + self.pipe_gap),
+            2:  (self.screen_width - self.pipe_width + 500, -300 + self.pipe_height + self.pipe_gap),
+            3:  (self.screen_width - self.pipe_width + 750, -300 + self.pipe_height + self.pipe_gap),
+            4:  (self.screen_width - self.pipe_width + 750, -300 + self.pipe_height + self.pipe_gap),
+        }
+        self.closest_pipe = 0
+        self.pipe_vel:int = -4
