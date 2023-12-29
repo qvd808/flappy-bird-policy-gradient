@@ -39,6 +39,8 @@ class FlappyBird:
         self.bird_x = self.screen_width // 5
         self.bird_y = self.screen_height // 2
         self.bird_vel = 4
+        self.bird_acc = 1
+        self.bird_max_vel = 6
 
         ## ground
         self.ground_x = 0
@@ -49,13 +51,21 @@ class FlappyBird:
         self.pipe_height: int = self.SpriteClass.LOWER_PIPE.get_height()
         self.pipe_width: int = self.SpriteClass.LOWER_PIPE.get_width()
         self.pipe_gap: int = 250 # space between upper and lower pipe
-        self.pipes: Dict[0, Tuple(int, int)] = {
+        self.upper_pipes: Dict[0, Tuple(int, int)] = {
             0:  (self.screen_width - self.pipe_width, -300),
             1:  (self.screen_width - self.pipe_width + 250, -300),
             2:  (self.screen_width - self.pipe_width + 500, -300),
             3:  (self.screen_width - self.pipe_width + 750, -300),
             4:  (self.screen_width - self.pipe_width + 750, -300),
         }
+        self.lower_pipes: Dict[0, Tuple(int, int)] = {
+            0:  (self.screen_width - self.pipe_width, -300 + self.pipe_height + self.pipe_gap),
+            1:  (self.screen_width - self.pipe_width + 250, -300 + self.pipe_height + self.pipe_gap),
+            2:  (self.screen_width - self.pipe_width + 500, -300 + self.pipe_height + self.pipe_gap),
+            3:  (self.screen_width - self.pipe_width + 750, -300 + self.pipe_height + self.pipe_gap),
+            4:  (self.screen_width - self.pipe_width + 750, -300 + self.pipe_height + self.pipe_gap),
+        }
+
         self.pipe_vel:int = -4
 
     class SpriteClass:
@@ -66,16 +76,26 @@ class FlappyBird:
         UPPER_PIPE = pygame.transform.flip(LOWER_PIPE, False, True)
 
     def update_pipe(self):
-        for pipe in self.pipes:
-            old_x, old_y = self.pipes[pipe]
+        for pipe in self.upper_pipes:
+            old_x, old_y = self.upper_pipes[pipe]
             if old_x + self.pipe_width + self.pipe_vel < 0:
-                furthest_x, _ = self.pipes[(pipe + 4) % 5]
-                self.pipes[pipe] = (furthest_x + 250, -300)
+                furthest_x, _ = self.upper_pipes[(pipe + 4) % 5]
+                self.upper_pipes[pipe] = (furthest_x + 250, -300)
             else:
-                self.pipes[pipe] = (old_x + self.pipe_vel, old_y)
+                self.upper_pipes[pipe] = (old_x + self.pipe_vel, old_y)
+
+        for pipe in self.lower_pipes:
+            old_x, old_y = self.lower_pipes[pipe]
+            if old_x + self.pipe_width + self.pipe_vel < 0:
+                furthest_x, _ = self.lower_pipes[(pipe + 4) % 5]
+                self.lower_pipes[pipe] = (furthest_x + 250, -300 + self.pipe_height + self.pipe_gap)
+            else:
+                self.lower_pipes[pipe] = (old_x + self.pipe_vel, old_y)
     
     def update_bird(self):
-        # self.bird_y += self.bird_vel
+        self.bird_vel = min(self.bird_vel + 1, self.bird_max_vel)
+
+        self.bird_y += self.bird_vel
         if self.bird_y > self.screen_height - self.SpriteClass.GROUND.get_height() - self.SpriteClass.BIRD.get_height():
             self.bird_y = self.screen_height - self.SpriteClass.GROUND.get_height() - self.SpriteClass.BIRD.get_height()
 
@@ -89,17 +109,30 @@ class FlappyBird:
     
     def check_crash(self):
 
-        for pipe in self.pipes:
-            pipe_x, pipe_y = self.pipes[pipe]
+        for pipe in self.upper_pipes:
+            pipe_x, pipe_y = self.upper_pipes[pipe]
             if is_collision((self.bird_x, self.bird_y, self.SpriteClass.BIRD.get_width(), self.SpriteClass.BIRD.get_height()),
                             (pipe_x, pipe_y, self.SpriteClass.UPPER_PIPE.get_width(), self.SpriteClass.UPPER_PIPE.get_height())
                             ):
                 return True
+            
+        for pipe in self.lower_pipes:
+            pipe_x, pipe_y = self.lower_pipes[pipe]
+            if is_collision((self.bird_x, self.bird_y, self.SpriteClass.BIRD.get_width(), self.SpriteClass.BIRD.get_height()),
+                            (pipe_x, pipe_y, self.SpriteClass.LOWER_PIPE.get_width(), self.SpriteClass.LOWER_PIPE.get_height())
+                            ):
+                return True
 
         return False
-    def next_state(self):
+    
+    def input_action(self, action: int):
+        self.bird_vel = -9
+
+    def next_state(self)-> bool: # Return wheter the games ends or not
         self.update_pipe()
         self.update_bird()
         self.update_ground()
         if self.check_crash():
-            print("lose")
+            return True
+
+        return False

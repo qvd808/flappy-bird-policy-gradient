@@ -24,9 +24,14 @@ class FlappyBirdRender():
         self.surface.fill((0, 0, 0)) #reset surface
         self.surface.blit(FlappyBird.SpriteClass.BG, (0, 0))
         
-        for coor in self.game.pipes.values():
+        for coor in self.game.upper_pipes.values():
             self.surface.blit(FlappyBird.SpriteClass.UPPER_PIPE, (coor[0], coor[1]))
             # self.surface.blit(FlappyBird.SpriteClass.LOWER_PIPE, (coor[0], coor[1] + self.game.pipe_height + self.game.pipe_gap))
+
+        for coor in self.game.lower_pipes.values():
+            self.surface.blit(FlappyBird.SpriteClass.LOWER_PIPE, (coor[0], coor[1]))
+            # self.surface.blit(FlappyBird.SpriteClass.LOWER_PIPE, (coor[0], coor[1] + self.game.pipe_height + self.game.pipe_gap))
+
 
         self.surface.blit(FlappyBird.SpriteClass.GROUND, (self.game.ground_x, self.game.ground_y))
 
