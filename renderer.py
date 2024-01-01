@@ -1,6 +1,7 @@
 import pygame
 import __future__
 from game_logic import FlappyBird
+import numpy as np
 
 class FlappyBirdRender():
     def __init__(
@@ -38,7 +39,6 @@ class FlappyBirdRender():
         self.surface.blit(FlappyBird.SpriteClass.GROUND, (self.game.ground_x, self.game.ground_y))
 
         self.surface.blit(FlappyBird.SpriteClass.BIRD, (self.game.bird_x, self.game.bird_y))
-
         ###
 
         # bird_x = self.game.bird_x
@@ -77,11 +77,20 @@ class FlappyBirdRender():
         self.make_display()
 
         while run:
+            action = 0
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        action = 1
             
             self.clock.tick(self.fps)
+            self.game.next_state()
+            self.game.input_action(action)
+
+            # action = np.random.randint(0, 2)
 
             self.update_surface()
             self.update_display()

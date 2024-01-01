@@ -42,6 +42,7 @@ class FlappyBird:
         self.bird_vel = 4
         self.bird_acc = 1
         self.bird_max_vel = 6
+        self._bird_flapped = False
 
         ## ground
         self.ground_x = 0
@@ -96,14 +97,12 @@ class FlappyBird:
                 self.lower_pipes[pipe] = (old_x + self.pipe_vel, old_y)
     
     def update_bird(self):
-        self.bird_vel = min(self.bird_vel + 1, self.bird_max_vel)
-
-        self.bird_y += self.bird_vel
-        if self.bird_y > self.screen_height - self.SpriteClass.GROUND.get_height() - self.SpriteClass.BIRD.get_height():
-            self.bird_y = self.screen_height - self.SpriteClass.GROUND.get_height() - self.SpriteClass.BIRD.get_height()
+        self.bird_y += min(
+            self.bird_vel, self.ground_y - self.bird_y - self.SpriteClass.BIRD.get_height()
+        )
 
         if self.bird_y < 0:
-            self.bird_y = 0
+            self.bird_y =  0
 
     def update_ground(self):
         self.ground_x += self.ground_vel
@@ -130,7 +129,15 @@ class FlappyBird:
     
     def input_action(self, action: int):
         if action:
-            self.bird_vel = -4
+            if self.bird_y > -2 * self.SpriteClass.BIRD.get_height():
+                self.bird_vel = -9
+                self._bird_flapped = True
+        
+        if self.bird_vel < 10 and not self._bird_flapped:
+            self.bird_vel += 1
+        
+        if self._bird_flapped:
+            self._bird_flapped = False
 
     def next_state(self)-> bool: # Return wheter the games ends or not
         self.update_pipe()
