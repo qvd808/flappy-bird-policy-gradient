@@ -34,6 +34,7 @@ class FlappyBird:
         ## Game properties
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.score = 0
 
         ## Bird properties
         self.bird_x = self.screen_width // 5
@@ -82,6 +83,7 @@ class FlappyBird:
                 furthest_x, _ = self.upper_pipes[(pipe + 4) % 5]
                 self.upper_pipes[pipe] = (furthest_x + 250, -300)
                 self.closest_pipe = (self.closest_pipe + 1) % 5
+                self.score += 1
             else:
                 self.upper_pipes[pipe] = (old_x + self.pipe_vel, old_y)
 
@@ -127,7 +129,8 @@ class FlappyBird:
         return False
     
     def input_action(self, action: int):
-        self.bird_vel = -9
+        if action:
+            self.bird_vel = -4
 
     def next_state(self)-> bool: # Return wheter the games ends or not
         self.update_pipe()

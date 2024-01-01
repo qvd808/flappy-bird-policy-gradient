@@ -26,14 +26,18 @@ class FlappyBirdEnv(gym.Env):
         self.game.input_action(action)
         terminate = False
         reward = 1
+
+        v_dist, h_dist = self._get_observation()
+        if (h_dist > FlappyBird.SpriteClass.BIRD.get_height()):
+            reward *= 2
         
         if self.game.next_state():
             terminate = True
+            reward = -1000
 
         if self.renderer != None:
             self.renderer.update_surface()
             self.renderer.update_display()
-
         return (self._get_observation(), reward, terminate)
 
 
@@ -52,7 +56,7 @@ class FlappyBirdEnv(gym.Env):
                 continue
             if v_dist > (self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() // 2 - self.game.bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2):
                 v_dist = self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() // 2 - self.game.bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2
-                h_dist = self.game.upper_pipes[pipe][1] + FlappyBird.SpriteClass.LOWER_PIPE.get_height() - self.game.bird_y
+                h_dist = self.game.bird_y - (self.game.upper_pipes[pipe][1] + FlappyBird.SpriteClass.LOWER_PIPE.get_height())
 
         return np.array(
             [v_dist, h_dist], dtype=np.float32
