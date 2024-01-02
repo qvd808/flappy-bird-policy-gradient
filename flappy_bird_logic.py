@@ -53,7 +53,7 @@ class FlappyBird:
         ## pipe properties
         self.pipe_height: int = self.SpriteClass.LOWER_PIPE.get_height()
         self.pipe_width: int = self.SpriteClass.LOWER_PIPE.get_width()
-        self.pipe_gap: int = 180 # space between upper and lower pipe
+        self.pipe_gap: int = 250 # space between upper and lower pipe
         self.upper_pipes: Dict[0, Tuple(int, int)] = {
             0:  (self.screen_width - self.pipe_width, -300),
             1:  (self.screen_width - self.pipe_width + 250, -300),

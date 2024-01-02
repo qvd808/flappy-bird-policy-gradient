@@ -58,9 +58,12 @@ class FlappyBirdEnv(gym.Env):
             if v_dist > (self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() // 2 - self.game.bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2):
                 v_dist = self.game.upper_pipes[pipe][0] + FlappyBird.SpriteClass.LOWER_PIPE.get_width() // 2 - self.game.bird_x + FlappyBird.SpriteClass.BIRD.get_width() // 2
                 h_dist = self.game.bird_y - (self.game.upper_pipes[pipe][1] + FlappyBird.SpriteClass.LOWER_PIPE.get_height())
+                        
+                v_dist_2 = v_dist + 250
+                h_dist_2 = self.game.bird_y - (self.game.upper_pipes[(pipe + 1) % 5][1] + FlappyBird.SpriteClass.LOWER_PIPE.get_height())
 
         return np.array(
-            [v_dist, h_dist], dtype=np.float32
+            [v_dist, h_dist, v_dist_2, h_dist_2], dtype=np.float32
         )
 
 

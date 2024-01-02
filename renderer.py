@@ -12,7 +12,7 @@ class FlappyBirdRender():
         ## Initialize some parameters
         self.display = None
         self.clock = pygame.time.Clock()
-        self.fps = 60
+        self.fps = 120
 
         self.game = game
         self.surface = pygame.Surface((game.screen_width, game.screen_height))
