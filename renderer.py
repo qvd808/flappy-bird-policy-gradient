@@ -1,6 +1,6 @@
 import pygame
 import __future__
-from game_logic import FlappyBird
+from flappy_bird_logic import FlappyBird
 import numpy as np
 
 class FlappyBirdRender():
@@ -12,7 +12,7 @@ class FlappyBirdRender():
         ## Initialize some parameters
         self.display = None
         self.clock = pygame.time.Clock()
-        self.fps = 60
+        self.fps = 90
 
         self.game = game
         self.surface = pygame.Surface((game.screen_width, game.screen_height))
