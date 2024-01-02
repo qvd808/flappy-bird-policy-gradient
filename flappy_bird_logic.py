@@ -1,5 +1,6 @@
 import pygame
 from typing import Dict, Tuple
+import numpy as np
 
 def is_collision(rect1, rect2):
     # rect1 and rect2 are represented as (x, y, width, height)
@@ -52,7 +53,7 @@ class FlappyBird:
         ## pipe properties
         self.pipe_height: int = self.SpriteClass.LOWER_PIPE.get_height()
         self.pipe_width: int = self.SpriteClass.LOWER_PIPE.get_width()
-        self.pipe_gap: int = 250 # space between upper and lower pipe
+        self.pipe_gap: int = 180 # space between upper and lower pipe
         self.upper_pipes: Dict[0, Tuple(int, int)] = {
             0:  (self.screen_width - self.pipe_width, -300),
             1:  (self.screen_width - self.pipe_width + 250, -300),
@@ -78,13 +79,16 @@ class FlappyBird:
         UPPER_PIPE = pygame.transform.flip(LOWER_PIPE, False, True)
 
     def update_pipe(self):
+
+        gap_y_diff = [-90, -70, -55, -30, -15, 0,
+                      90, 70, 55, 30]
+        gap = np.random.choice(gap_y_diff)
+
         for pipe in self.upper_pipes:
             old_x, old_y = self.upper_pipes[pipe]
             if old_x + self.pipe_width + self.pipe_vel < 0:
                 furthest_x, _ = self.upper_pipes[(pipe + 4) % 5]
-                self.upper_pipes[pipe] = (furthest_x + 250, -300)
-                self.closest_pipe = (self.closest_pipe + 1) % 5
-                self.score += 1
+                self.upper_pipes[pipe] = (furthest_x + 250, -300 + gap)
             else:
                 self.upper_pipes[pipe] = (old_x + self.pipe_vel, old_y)
 
@@ -92,7 +96,7 @@ class FlappyBird:
             old_x, old_y = self.lower_pipes[pipe]
             if old_x + self.pipe_width + self.pipe_vel < 0:
                 furthest_x, _ = self.lower_pipes[(pipe + 4) % 5]
-                self.lower_pipes[pipe] = (furthest_x + 250, -300 + self.pipe_height + self.pipe_gap)
+                self.lower_pipes[pipe] = (furthest_x + 250, -300 + self.pipe_height + self.pipe_gap + gap)
             else:
                 self.lower_pipes[pipe] = (old_x + self.pipe_vel, old_y)
     
